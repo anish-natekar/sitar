@@ -19,7 +19,7 @@
 
         <header>
           <h1>Sitar</h1>
-          <h2>A framework for modelling cycle-based systems</h2>
+          <h2>A cycle-based simulation framework</h2>
         </header>
 
         <section id="downloads" class="clearfix">
@@ -32,9 +32,9 @@
 
         <section id="main_content">
           <p> 
-Sitar is a tool for modeling and simulation of cycle-based systems.
+Sitar is a framework for modeling and simulation of cycle-based (discrete-time) systems.
 It consists of a system description language and a lightweight simulation kernel.  
-A system can be described as a set of concurrent, interconnected modules
+A system is described as a set of concurrent, interconnected modules
 operating on a global clock.  The language supports hierarchical
 descriptions: modules can contain instances of other modules.
 The behavior of each module can be described in an imperative manner as a
@@ -56,10 +56,9 @@ Each module description gets translated to a C++ class. The generated code can
 be compiled and linked together with the simulation kernel to get a single
 simulation executable. The simulation kernel consists of a
 small set of C++ classes, and supports parallel execution using OpenMP. 
-The simulation algorithm uses two-phase execution : each clock cycle
-is divided into two phases, and input/output events are
-restricted to separate phases, leading to a race-free execution.
-</p>
+The simulation uses a two-phase algorithm for deterministic execution : each clock cycle
+is divided into two phases, and input/output events are restricted to separate phases.
+ </p>
 
 <p>Sitar can be used for modeling discrete-event systems such as 
 computer-architectural models, communication 
