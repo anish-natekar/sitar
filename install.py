@@ -10,7 +10,7 @@ os.chdir(working_dir)
 
 
 #install antlr C runtime
-print "Installing antlr3C runtime............"
+print ("Installing antlr3C runtime............")
 os.chdir("./translator/antlr3Cruntime/")
 command = "tar -xzvf libantlr3c-3.4.tar.gz"
 subprocess.call(command.split())
@@ -34,29 +34,29 @@ status = subprocess.call("scons")
 
 #done
 if(status==0):
-	print "======================"
-	print "finished installation"
-	print "======================"
-	print ""
-	print "add the following lines to your ~/.bashrc file"
-	print "#-------------------------"
-	print "#sitarV2 paths:"
+	print ("======================")
+	print ("finished installation")
+	print ("======================")
+	print ()
+	print ("add the following lines to your ~/.bashrc file")
+	print ("#-------------------------")
+	print ("#sitarV2 paths:")
 	lib_path = working_dir+"/translator/antlr3Cruntime/build/lib"
 	path     = working_dir+"/scripts"
 	alias_path = working_dir+"/translator/antlrworks-1.4.3.jar"
 	s= "export LD_LIBRARY_PATH="+lib_path+":${LD_LIBRARY_PATH}"
-	print s
+	print (s)
 	s ="export PATH="+path+":${PATH}"
-	print s
+	print (s)
 	s = "alias antlrwors='java -jar "+alias_path+"'"
-	print s
-	print "#-------------------------"
+	print (s)
+	print ("#-------------------------")
 else :
 	
-	print "======================"
-	print"installation FAILED"
-	print "======================"
+	print ("======================")
+	print ("installation FAILED")
+	print ("======================")
 	
-print "\n\n"
+print ("\n\n")
 
 
