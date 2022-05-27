@@ -6,7 +6,7 @@ PREREQUISITES:
 
 	Linux (tested on Ubuntu 12:04)
 	gcc >= version 4.5
-	python >= version 2.7
+	python >= version 2.7 ("python" and not "python3", if in case you don't have python installed do sudo apt install python)
 	scons
 	OpenMP (optional) Required for parallel simulation.
 		
@@ -28,6 +28,7 @@ INSTALLATION INSTRUCTIONS (FOR LINUX):
 		export LD_LIBRARY_PATH=<path-to-sitar>/translator/antlr3Cruntime/build/lib:${LD_LIBRARY_PATH}
 		export PATH=<path-to-sitar>/scripts:${PATH}
 		#-------------------------
+
 
 	STEP 3. Refer to /examples/README for running examples.
 
