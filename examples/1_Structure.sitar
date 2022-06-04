@@ -17,7 +17,6 @@ module Structure
 	end behavior
 end module
 
-
 module A
 	inport  inp : width  16
 	outport outp
@@ -26,7 +25,6 @@ module A
 	$cout<<"\nRunning module "<<hierarchicalId();$;
 	end behavior
 end module
-
 
 module B
 	inport  inp  

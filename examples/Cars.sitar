@@ -1,3 +1,13 @@
+//The environment
+module Top
+	submodule car_A, car_B : Car
+	init
+	$
+		car_A.start_time=1;
+		car_B.start_time=2;
+	$
+end module
+
 //Car
 module Car
 	decl $unsigned int start_time;$
@@ -17,13 +27,4 @@ module Car
  	end behavior
 end module
 
-//The environment
-module Top
-	submodule car_A, car_B : Car
-	init
-	$
-		car_A.start_time=1;
-		car_B.start_time=2;
-	$
-end module
 

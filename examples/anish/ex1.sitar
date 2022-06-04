@@ -1,0 +1,22 @@
+module Top
+    submodule a : Arrival<3>
+module end
+
+// source to generate customers
+module Arrival
+    decl $int students_arrived=0;$
+    parameter int NUMBER_OF_STUDENTS = 2
+    submodule_array student[NUMBER_OF_STUDENTS] : Student<2, 7>
+end Source
+
+module Student
+    parameter int MIN_ARRIVAL_TIME = 1
+    parameter int MAX_ARRIVAL_TIME = 3
+    $ARRIVAL_TIME = rand()%(MAX_ARRIVAL_TIME - MIN_ARRIVAL_TIME + 1)+MIN_ARRIVAL_TIME;$;
+    behavior
+        wait until(this_cycle >= ARRIVAL_TIME);
+        $cout<<"Student with ID:"<<INDEX<<" Has reached school at time"<< current_time;$;
+        $a.students_arrived++;$;
+        $cout<<"Total number of student in school "<< Arrival.students_arrived;$;
+    end behavior
+end module
