@@ -1,0 +1,82 @@
+module Top
+    submodule exam : ExaminationHall<40>
+    // A hall where 40 students are expected to give their exams
+    submodule cl : ExaminationPeriod<10, 30>
+    // The exam begins 10 mins after simulation starts and is for 30mins after which students submit their answers
+end module
+
+
+module ExaminationHall
+    parameter int NUM_STUDENTS = 1
+    
+    decl    $int student_count;$ // variable to keep count of how many students came to give exam
+    decl    $int bathroom_break;$ // variable to keep count of how many students went to bathroom during exam
+    decl    $int late;$ // variable to keep count of ow many students were late to the exam hall
+    
+
+    submodule_array students[NUM_STUDENTS] : Student<10, 2, 5, 1, 15, 10> // the exam has 10 mcq questions where the time required to solve a question is <=5 and >=2 mins.
+    // The minimu arrival time of the student is 1 min and maximu is 15 mins. 10 mins is the time when the exam starts.
+    // each student have a pointer to the three counter variables declared above
+    
+    init
+    $
+    for(int i=0; i<NUM_STUDENTS;i++)
+    {
+        students[i].student_count_ptr = &student_count;
+        students[i].late_ptr = &late;
+        students[i].bathroom_break_ptr = &bathroom_break;
+    }
+    $
+end module
+
+
+module Student
+    parameter int questions = 3
+    parameter int min_time_per_question = 1
+    parameter int max_time_per_question = 2
+    parameter int min_arrival_time = 1
+    parameter int max_arrival_time = 2
+    parameter int exam_start_time = 1
+
+    decl $int* student_count_ptr;   int* bathroom_break_ptr;    int* late_ptr;   int time_taken;    int questions_solved;$
+
+    behavior
+        $
+        time_taken = rand()%(max_arrival_time - min_arrival_time + 1) + min_arrival_time;
+        $;
+        wait (time_taken, 0);   // time taken to reach Exam Hall
+        $if(time_taken > exam_start_time) {
+            cout<<hierarchicalId()<<" arrived late "<< current_time <<" and started the exam instantly"<< endl;
+            (*late_ptr)++;
+        }
+        else
+            cout<<hierarchicalId()<<" has arrived to the ExaminationHall at " << current_time << endl;
+        (*student_count_ptr)++;
+        $;
+        wait until(this_cycle >= exam_start_time);  // Waiting for exam to start_time
+        do
+            $time_taken = rand()%(max_time_per_question - min_time_per_question + 1) + min_time_per_question;$;
+            wait(time_taken, 0);
+            $
+            questions_solved++;
+            cout << hierarchicalId() << " has solved a question at time " << current_time << endl;
+            $;
+        while(questions_solved<questions) end do;
+        $
+        cout << hierarchicalId() << " has completed the paper" << endl;
+        $;
+    end behavior
+end module
+
+
+module ExaminationPeriod
+    parameter int start_time = 1
+    parameter int duration = 5
+    behavior
+        wait(start_time, 0);
+        $cout<<"Exam has Begun"<<endl;$;
+        wait(duration, 0);
+        stop simulation;
+        $cout<<"Exam has ended"<<endl;$;
+    end behavior
+end module

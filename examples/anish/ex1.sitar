@@ -1,22 +1,56 @@
 module Top
-    submodule a : Arrival<3>
-module end
+    submodule cl : Classroom<5> //A classroom with 5 students
+end module 
 
-// source to generate customers
-module Arrival
-    decl $int students_arrived=0;$
-    parameter int NUMBER_OF_STUDENTS = 2
-    submodule_array student[NUMBER_OF_STUDENTS] : Student<2, 7>
-end Source
+// A classroom 
+module Classroom
+	parameter int NUM_STUDENTS = 1
+	decl $int student_count;$
+	submodule_array student[NUM_STUDENTS] : Student
+	//let each student have a pointer to the 
+	//the variable student_count, so they can update it
+	init
+	$
+	student_count=0;
+	for(int i=0;i<NUM_STUDENTS;i++)
+	{student[i].student_count_ptr=&student_count;
+	}
+	$
+	behavior
+	//just print the student count at the end of each cycle
+	wait(0,1);
+	do
+		$log<<endl<<"Total students in class so far = "<<student_count;$;
+		wait(1,0);
+	while (1) end do;
+	end behavior
+end module
+
 
 module Student
-    parameter int MIN_ARRIVAL_TIME = 1
-    parameter int MAX_ARRIVAL_TIME = 3
-    $ARRIVAL_TIME = rand()%(MAX_ARRIVAL_TIME - MIN_ARRIVAL_TIME + 1)+MIN_ARRIVAL_TIME;$;
-    behavior
-        wait until(this_cycle >= ARRIVAL_TIME);
-        $cout<<"Student with ID:"<<INDEX<<" Has reached school at time"<< current_time;$;
-        $a.students_arrived++;$;
-        $cout<<"Total number of student in school "<< Arrival.students_arrived;$;
-    end behavior
+	//The class begins at time 0, but each student
+	//arrives to the class delayed by some amount between 
+	//0 to 10 cycles.
+	decl $int* student_count_ptr;$ //pointer to student count
+	decl $int delay;$
+	behavior
+		$delay=rand()%9+1;$; //delay randomly set between 1 to 10
+		wait (delay,0);
+		$log<<endl<<"Entered the class";$;
+
+		//increment student count
+		$(*student_count_ptr)++;$; 
+		//Note: here we are directly modifying a variable in another module.
+		//this may cause wrong updates if Students objects and Class are mapped to 
+		//separate threads. It will work fine in sequential execution.
+
+		do 
+		//this student does some learning
+			wait(1,0);
+			$log<<endl<<"learning";$;
+		while (1) end do;
+	end behavior
 end module
+
+
+
