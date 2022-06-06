@@ -29,6 +29,12 @@ module ExaminationHall
         students[i].bathroom_occupied_ptr = &bathroom_occupied;
     }
     $
+    behavior
+        do
+            $log<<"Time = "<<current_time<<"\t student count = "<<student_count<<"\t late = "<<late<<"\t bathroom_breaks = "<<bathroom_break<<"\t bathroom_occupied = "<<bathroom_occupied<<endl;$;
+            wait(1,0);
+        while(1) end do;
+    end behavior
 end module
 
 
@@ -59,7 +65,7 @@ module Student
         do
             if($(rand()%10+1) == 5 && (*bathroom_occupied_ptr)==0$) then
                 $*bathroom_occupied_ptr=1;$;
-                $*bathroom_break_ptr++;$;
+                $(*bathroom_break_ptr)++;$;
                 $cout<<hierarchicalId()<<" went to the bathroom" << endl;$;
                 wait($rand()%6+5$, 0);
                 $cout<<hierarchicalId()<<" came back from bathroom"<< endl;$;
