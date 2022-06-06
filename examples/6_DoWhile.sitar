@@ -1,6 +1,6 @@
 
 module Top
-	submodule a : DoWhile 
+	submodule a : DoWhile
 end module
 
 module DoWhile

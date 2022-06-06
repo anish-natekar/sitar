@@ -9,8 +9,10 @@ end module
 module ExaminationHall
     parameter int NUM_STUDENTS = 1
     
-    decl    $int student_count;$ // variable to keep count of how many students came to give exam
-    decl    $int late;$ // variable to keep count of ow many students were late to the exam hall
+    decl    $int student_count = 0;$ // variable to keep count of how many students came to give exam
+    decl    $int bathroom_break = 0;$ // variable to keep count of how many students went to bathroom during exam
+    decl    $int bathroom_occupied = 0;$ // variable to check if the bathroom is occupied or not
+    decl    $int late = 0;$ // variable to keep count of ow many students were late to the exam hall
     
 
     submodule_array students[NUM_STUDENTS] : Student<10, 2, 5, 1, 15, 10> // the exam has 10 mcq questions where the time required to solve a question is <=5 and >=2 mins.
@@ -23,6 +25,8 @@ module ExaminationHall
     {
         students[i].student_count_ptr = &student_count;
         students[i].late_ptr = &late;
+        students[i].bathroom_break_ptr = &bathroom_break;
+        students[i].bathroom_occupied_ptr = &bathroom_occupied;
     }
     $
 end module
@@ -36,8 +40,8 @@ module Student
     parameter int max_arrival_time = 2
     parameter int exam_start_time = 1
 
-    decl $int* student_count_ptr;   int* late_ptr;   int time_taken;    int questions_solved;$
-
+    decl $int* student_count_ptr;   int* bathroom_break_ptr;    int* bathroom_occupied_ptr;   int* late_ptr;   int time_taken;    int questions_solved = 0;$
+    init $questions_solved = 0;$
     behavior
         $
         time_taken = rand()%(max_arrival_time - min_arrival_time + 1) + min_arrival_time;
@@ -53,16 +57,23 @@ module Student
         $;
         wait until(this_cycle >= exam_start_time);  // Waiting for exam to start_time
         do
-            $time_taken = rand()%(max_time_per_question - min_time_per_question + 1) + min_time_per_question;$;
-            wait(time_taken, 0);
-            $
-            questions_solved++;
-            cout << hierarchicalId() << " has solved a question at time " << current_time << endl;
-            $;
+            if($(rand()%10+1) == 5 && (*bathroom_occupied_ptr)==0$) then
+                $*bathroom_occupied_ptr=1;$;
+                $*bathroom_break_ptr++;$;
+                $cout<<hierarchicalId()<<" went to the bathroom" << endl;$;
+                wait($rand()%6+5$, 0);
+                $cout<<hierarchicalId()<<" came back from bathroom"<< endl;$;
+                $*bathroom_occupied_ptr=0;$;
+            else
+                $time_taken = rand()%(max_time_per_question - min_time_per_question + 1) + min_time_per_question;$;
+                wait(time_taken, 0);
+                $
+                questions_solved++;
+                cout << hierarchicalId() << " has solved a question at time " << current_time << endl;
+                $;
+            end if;
         while(questions_solved<questions) end do;
-        $
-        cout << hierarchicalId() << " has completed the paper" << endl;
-        $;
+        $cout << hierarchicalId() << " has completed the paper" << endl;$;
     end behavior
 end module
 

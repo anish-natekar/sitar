@@ -1,0 +1,53 @@
+// simulation of small library
+
+module Top
+    submodule lib : Library <10, 10, 5, 30>
+    submodule clk : LibraryTimings <10, 99>
+end module
+
+module LibraryTimings
+    parameter int start_time = 1
+    parameter int end_time = 10
+    behavior
+        wait(10,1);
+        $cout<<"Time = "<<current_time<<",\tThe library opened"<<endl;$;
+        wait (end_time-start_time, 0);
+        $cout<<"Time = "<<current_time<<",\tThe library closed and everyone has left"<<endl;$;
+        stop simulation;
+    end behavior
+end module
+
+procedure Student
+    parameter int min_stay_time = 1
+    parameter int max_stay_time = 3
+    behavior
+        $cout<<"Time = "<<current_time<<",\tStudent arrived and took a seat"<<endl;$;
+        wait($rand()%(max_stay_time-min_stay_time+1)+min_stay_time$, 0);
+        $cout<<"Time = "<<current_time<<",\tStudent left the library"<<endl;$;
+    end behavior
+end procedure
+
+module Library
+    parameter int seats = 3
+    parameter int start_time = 10
+    parameter int min_arrival_time = 1
+    parameter int max_arrival_time = 3
+
+    procedure p : Student<10, 30>
+    
+    decl $int seats_occupied;$
+
+    init $seats_occupied = 0;$
+    
+    behavior
+        wait (start_time, 0);
+        $int i = 1;$;
+        do
+            wait($rand()%(1+max_arrival_time-min_arrival_time)+min_arrival_time$, 0);
+            if (seats_occupied < seats) then
+                $seats_occupied++;$;
+                run p;
+            end if;
+        while (1) end do; 
+    end behavior
+end module
