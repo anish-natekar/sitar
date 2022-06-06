@@ -42,6 +42,15 @@ class inport:public base_inport
 			assert(_net);
 			return getNet()->pull(tok);
 			}
+
+			bool peek(token<_width>& tok)
+			// peek a token and put into tok
+			// and return 1 if peek is
+			// successful, return 0 otherwise
+			{
+			asset(_net);
+			return getNet()->peek(tok);
+			}
 	
 			//return true if there are no tokens
 			//to be pulled

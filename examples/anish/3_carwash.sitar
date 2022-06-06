@@ -1,0 +1,110 @@
+module Top
+		submodule CW : Carwash<3>
+		submodule CQ : CarQueue<15, 3>
+		submodule_array WM[3] : WashingMachine<10>
+
+		net_array car_connect[3] : capacity 1 width 4
+		net Q_to_CW : capacity 1 width 4
+
+		for i in 0 to 2
+				CW.car_out[i] => car_connect[i] 
+				WM[i].car <= car_connect[i]
+		end for
+
+		CQ.car_out => Q_to_CW
+		CW.car_in <= Q_to_CW
+		end module
+
+module Carwash
+		parameter int NUM_MACHINES = 1
+		inport car_in : width 4
+		outport_array car_out[NUM_MACHINES] : width 4
+		decl $token<4> incoming_car;$
+		decl $bool no_cars;$
+		
+		behavior
+		do
+		wait until (this_phase == 0);
+		$
+		for(int i=0; i < NUM_MACHINES; i++){
+				no_cars = !car_in.peek(incoming_car);	
+				if(no_cars){
+						break;
+				}
+				if(car_out[i].push(incoming_car)){
+						car_in.pull(incoming_car);	
+						cout << current_time << "\t" << "Car entered with id " << incoming_car.ID << " sent to washing machine no "<< i << endl;
+				}
+		}
+		$;
+
+		wait until (this_phase == 1);
+		while(1) end do;
+		end behavior
+end module
+
+module CarQueue
+		parameter int NUM_CARS = 1
+		parameter int MAX_WAIT = 20
+		outport car_out : width 4
+		decl $bool car_sent; int random_wait;$
+		decl $token<4> cars[NUM_CARS];$
+		decl $int n;$
+
+		init $n = 0;$
+		
+		behavior
+		do 
+		wait until (this_phase == 1);
+
+		$
+		cars[n].ID = n;
+		car_sent = car_out.push(cars[n]);
+		if(car_sent){
+				cout << current_time << "\t"  << "Car with ID " << cars[n].ID << " was sent for washing." << endl;
+				n = n+1;
+		}
+		else{
+				cout << current_time << "\t" << "Car wash full could not sent car with id " << cars[n].ID << " to wash." << endl;
+				n = n;
+		}
+		$;
+		wait until (this_phase == 0);
+		if(car_sent) then
+				$random_wait = rand()%MAX_WAIT;$;
+				$cout << current_time << "\t" << "Waiting for " << random_wait << " cycles for car " << n << endl;$;
+				wait(random_wait, 0);
+		end if;
+
+		while(n < NUM_CARS) end do;
+		end behavior
+end module
+
+module WashingMachine
+		parameter int WASHING_TIME = 1
+		inport car : width 4
+
+		decl $token<4> CAR;$
+		decl $bool car_entered;$
+		init $car_entered = 0;$
+
+		behavior 
+		do
+		wait until (this_phase == 0);
+		$car_entered = car.peek(CAR);$;
+				if(car_entered) then
+						$
+						cout << current_time << "\t" << "Washing car with id " << CAR.ID << " in " << hierarchicalId() <<endl;
+						$;
+						wait(WASHING_TIME-1, 0);
+						$
+						car.pull(CAR);
+						cout << current_time << "\t" << "Done washing car with id " << CAR.ID << " in " << hierarchicalId() <<  endl;
+						$;
+				end if;
+		wait until (this_phase == 1);
+
+		while(1) end do;
+		end behavior
+end module
+
